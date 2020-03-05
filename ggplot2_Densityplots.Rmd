@@ -1,0 +1,191 @@
+---
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE, 
+                      fig.width=5, fig.height=3, fig.align='center')
+```
+
+### ggplot2 Series 2 - Histogram and Density plot
+
+```{r, warning = FALSE}
+# Load libraries
+library(ggplot2)
+library(ggfortify)
+library(dplyr)
+library(knitr)
+library(kableExtra)
+```
+The dataset we will use for this tutorial is from Kaggle: https://www.kaggle.com/c/house-prices-advanced-regression-techniques/data
+
+
+```{r}
+# Load data for demonstration
+house_data <- read.csv('house_price.csv', header = TRUE)
+options(scipen=999)  # turn off scientific notation like 1e+06
+kable(head(house_data[c('GrLivArea', 'GarageType', 'SalePrice', 'CentralAir')], 3), align=c(rep('c',times=4))) %>%
+      kable_styling(bootstrap_options=c("condensed"), full_width=FALSE)
+```
+
+Columns we will use in this tutorial:
+
+ - GrLivArea: Above grade (ground) living area square feet
+ - GarageType: Type of Garage location
+ - SalePrice: the property's sale price in dollars
+ - CentralAir - Central air conditioning (Binary): Y: yes, N: no
+
+#### Basic Syntax
+```{r}
+#plot distribution of SalePrice
+gg_hist <- ggplot(house_data, aes(x=SalePrice)) + geom_histogram()
+print(gg_hist)
+```
+
+
+#### Customize histogram
+```{r}
+ggplot(house_data, aes(x=SalePrice)) + 
+       geom_histogram(
+                      alpha= .3,                  # set transparency of histogram
+                      binwidth=50000,            # set the width of the bins
+                      colour="lightsteelblue3",  # color of the outline
+                      fill="lightsteelblue"      # color of bins
+                     )
+```
+
+
+####  Add lines to the histogram
+```{r}
+ggplot(house_data, aes(x=SalePrice)) + 
+       geom_histogram(alpha=.3, 
+                      colour="lightsteelblue3", 
+                      fill='lightsteelblue') + 
+       geom_vline(xintercept=300000,             # vertical line
+                  linetype="longdash",
+                  color="lightsteelblue4", size=.5) +
+       geom_hline(yintercept=100,                # horizontal line
+                  linetype="dotdash",
+                  color="lightsteelblue4", size=.5)
+```
+
+Some linetypes availables:
+```{r pressure, echo=FALSE, fig.cap="Line types", out.width = '60%'}
+include_graphics("line_type.JPG")
+```
+
+#### Add annotation to the histogram
+
+```{r}
+# Add mean and variance to the histogram
+avg <- round(mean(house_data$SalePrice), 2)
+std <- round(sd(house_data$SalePrice), 2)
+
+# Method 1
+ggplot(house_data, aes(x=SalePrice)) + 
+       geom_histogram(alpha=.3, 
+                       colour="lightsteelblue3", 
+                       fill='lightsteelblue') + 
+       annotate("text", x=350000, y=100, 
+                     color="lightsteelblue4",
+                     label=paste("Mean:", avg)) +
+       annotate("text", x=350000, y=150, 
+                 color="lightsteelblue4",
+                 label=paste("Standard Deviaion:", std))
+
+# Method 2: adding all annotations at once
+annotation <- data.frame(
+                         x=rep(350000, 2),
+                         y=c(100, 150),
+                         label=c(paste("Standard Deviaion:", std),
+                                  paste("Mean:", avg))
+                        )
+ggplot(house_data, aes(x=SalePrice)) + 
+       geom_histogram(alpha=.3, 
+                       colour="lightsteelblue3", 
+                       fill='lightsteelblue') + 
+       geom_text(data=annotation, 
+                      aes(x=x, y=y, label=label),                 
+                      color="lightsteelblue4", 
+                      size=4, angle=0, fontface="italic" )
+```
+
+
+#### Add kernel density line on to histogram
+
+```{r}
+# Add kernel density line on to histogram
+ggplot(house_data, aes(x=SalePrice)) + 
+       geom_histogram(aes(y=..density..),        # the y axis of histogram has to be density too
+                      alpha=.3, 
+                      colour="lightsteelblue3", 
+                      fill='lightsteelblue') +
+       geom_density(alpha=.3, 
+                    color=NA,                    # no outline 
+                    fill='lightsteelblue4')
+```
+
+
+#### Overlaid histograms
+```{r}
+# Two histograms seperated by categorical column: GarageType
+ggplot(house_data, aes(x=SalePrice, 
+                       fill=GarageType)) +       
+       geom_histogram(alpha=.3, 
+                      colour="lightsteelblue3") +
+       scale_fill_brewer(palette="RdBu")         # change colour scheme
+
+```
+
+What if I want to overlay a few density plots? For example, I want to plot the density of SalePrice and GrLivArea at the same time. We can use the melt function from reshape2 package
+
+```{r}
+library(reshape2)
+tmp <- house_data[c('TotalBsmtSF', 'GrLivArea')]
+```
+
+The melt function stacks a set of columns into a single column of data.
+It generates a new dataframe is generated with two columns: variable and value
+
+```{r}
+kable(head(melt(tmp), 3), row.names = FALSE) %>%
+      kable_styling(bootstrap_options=c("striped", "hover", "condensed"), full_width=FALSE)
+kable(tail(melt(tmp), 3), row.names = FALSE) %>%
+      kable_styling(bootstrap_options=c("striped", "hover", "condensed"), full_width=FALSE)
+
+ggplot(melt(tmp), aes(x=value, fill=variable)) + 
+       geom_histogram(aes(y=..density..), 
+                      alpha=.3,
+                      colour="lightsteelblue1") +
+       geom_density(alpha=.5, 
+                    color="lightsteelblue3") +
+       scale_fill_brewer(palette="Pastel1") 
+```
+
+#### Add vertical lines to each of the histograms in the same plot
+```{r}
+# 1. Find the mean of each group
+library(plyr)
+mean_Ggroup <- ddply(house_data, "CentralAir", summarise, meanPrice=mean(SalePrice))
+kable(mean_Ggroup, align=c(rep('c',times=2))) %>%
+      kable_styling(bootstrap_options=c("striped", "hover", "condensed"), full_width=FALSE)
+
+# 2. Add vertical lines using the mean value as xintercept
+ggplot(house_data, aes(x=SalePrice, 
+                       fill=CentralAir)) + # seperated by categorical column: GarageType
+       geom_histogram(alpha=.3, 
+                      colour="lightsteelblue3") +
+       geom_vline(data=mean_Ggroup, 
+                  aes(xintercept=meanPrice, colour=CentralAir),
+                  linetype="dotdash", size=.5) +
+       scale_fill_brewer(palette="Pastel1") # change colour scheme
+```
+
+
+
+
+
+
+
+
+
