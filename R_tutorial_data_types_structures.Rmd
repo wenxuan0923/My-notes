@@ -1,0 +1,229 @@
+---
+author: "Thalia"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(kableExtra)
+library(dplyr)
+library(gplots)
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+```
+
+### Data Types and Structures in R
+#### 1. Data types
+
+Everything in R is an object. There are mainly five **data types**: 
+
+```{r, echo=FALSE}
+data_types <- c("Character", "Integer", "Numeric", "Logical", 'Complex')
+description <- c('Strings', 'Intergers', 'Integers & Factions',
+                 'Boolean', 'Complex value')
+examples <- c("\"Hello\", \"2.3 \", \"TRUE\"", 2, 12.3, "TRUE & FALSE", "3+2i")
+
+tabl <- data.frame(data_types, description, examples)
+kable(tabl, format= "html") %>%
+  kable_styling("striped", full_width = FALSE) %>%
+  column_spec(1, width = "10em", bold = TRUE) %>%
+  column_spec(2, width = "10em") %>%
+  column_spec(3, width = "13em") 
+```
+
+R provides many functions to examine features of vectors and other objects, for example:
+
+```{r, echo=FALSE}
+functions <- c("class()", "typeof()", "length()", "attributes()")
+description <- c("The object's datatype (high-level)",
+                 "The object's datatype (lowlevel)",
+                 "The length of the object", 
+                 "The names of the metadata of the object")
+
+tabl <- data.frame(functions, description)
+kable(tabl, format= "html") %>%
+  kable_styling("striped", full_width = FALSE) %>%
+  column_spec(1, width = "10em", bold = TRUE) %>%
+  column_spec(2, width = "20em") 
+```
+
+| Expression     | Result     |
+|:-----------------|:-------------| 
+|  class(10)      |   `r class(10)`     |
+|  typeof(10)     |   `r typeof(10)`    |
+|  class(7.12)    |   `r class(7.12)`   |
+|  typeof(7.12)   |   `r typeof(7.123)` |
+|  class("HELLO") |   `r class("HELLO")`|
+|  length("HELLO")|   `r length("HELLO")`|
+|  class("TRUE")  |   `r class("TRUE")` |
+|  class(TRUE)    |   `r class(TRUE)`   |
+|  class(4+2i)    |   `r class(4+2i) `  |
+|  class(NA)      |   `r class(NA)`     |
+|  length(NA)     |   `r length(NA)`|
+|  class(NULL)    |   `r class(NULL)`   |
+|  length(NULL)    |   `r length(NULL)`   |
+
+
+**Note**: there are multiple classes that are grouped together as "numeric" classes. The 2 most common of which are double and integer. Most math is done using double precision, so that is often the default storage.
+
+#### 2. Data structures
+
+Elements of these data types may be combined to form **data structures**:
+
+- Vectors
+- Lists
+- Matrices 
+- Arrays 
+- Factors
+- Data Frames
+
+**I. Definition of vectors**
+
+Vector is a basic data structure in R. It contains element of the \textcolor{red}{same} type. The data types can be logical, integer, double, character, complex or raw. There are different ways to define vectors:
+
+**1. c() function**
+```{r}
+a <- c(1,2,3,4)
+print(a)
+```
+**2. Colon operator**
+```{r}
+b <- 1:10
+print(b)
+```
+**3. Sequence operator**
+```{r}
+c <- seq(5, 9, by = 2)
+print(c)
+```
+**4. Replicate Elements Of Vectors or Lists**
+```{r}
+d <- rep('hi', 5)
+print(d)
+```
+**Assign name of elements in list**
+```{r}
+e <- c('apple' = 1, banana = 2, "kiwi fruit" = 3, 4)
+print(e)
+```
+
+**II. Definition of lists**
+
+Lists are the R objects which contain elements of **different** types like − numbers, strings, vectors and another list inside it
+```{r}
+# Defination of Vectors
+lst <- list('Thalia', 26, 'Seattle')
+print(lst)
+```
+
+**Assign name of elements in list**
+```{r}
+lst <- list('Thalia', 26, 'Seattle')
+names(lst) <- c('Name', 'Age', 'Home')
+print(lst)
+```
+
+**III. Definition of metrices**
+
+Matrices are the R objects in which the elements are arranged in a two-dimensional rectangular layout. They contain elements of the **same** types.
+```{r}
+mtx1 <- matrix(c(1:8), nrow=4, byrow=TRUE)
+print(mtx1)
+```
+
+**Assign name of row and columns in matrix**
+```{r}
+# Define the column and row names
+rownames = c("row1", "row2", "row3", "row4")
+colnames = c("col1", "col2")
+
+# Create the matrix
+mtx2 <-  matrix(c(1:8), nrow = 4, byrow = FALSE, 
+                dimnames = list(rownames, colnames))
+print(mtx2)
+```
+
+**IV. Definition of arrays**
+
+Arrays are the R data objects which can store data in more than two dimensions. For example − If we create an array of dimension (2, 3, 4) then it creates 4 matrices each with 2 rows and 3 columns. Arrays can store only **same** data type.
+
+```{r}
+vector1 <- c(5, 9, 3)
+vector2 <- c(10, 11, 12, 13, 14, 15)
+# You can use the c() function to combine vectors 
+print(c(vector1, vector2))
+# Take these vectors as input to the array.
+result1 <- array(c(vector1, vector2), dim = c(3,3,2))
+# Create the matrix.
+print(result1)
+```
+**Assign name of rows, columns, and matrix in arrays**
+```{r}
+# You can also assign name to each dimension of the array
+col_names <- c("Col1", "Col2", "Col3")
+row_names <- c("Row1", "Row2", "Row3")
+matrix_names <- c("Matrix1", "Matrix2")
+
+result2 <- array(c(vector1, vector2), dim = c(3,3,2), 
+                 dimnames=list(row_names, 
+                               col_names,
+                               matrix_names))
+print(result2)
+
+```
+
+**V. Definition of Factors**
+
+Categorical variable where each level is a category. It can store both strings and integers.
+
+```{r}
+# Factors are created using the factor () function by taking a vector as input.
+loc <- c("East","West","East","North","North","East","West","South","West","East","North")
+print(factor(loc))
+
+val <- c(1, 2, 3, 2, 2, 2, 3, 1)
+print(factor(val))
+```
+
+**VI. Definition of Data Frame**
+
+A data frame is a table or a two-dimensional array-like structure in which each column contains values of one variable and each row contains one set of values from each column. The data stored in a data frame can be of numeric, factor or character type.
+
+```{r}
+employee_df <- data.frame(
+   emp_id = c (1:5), 
+   emp_name = c("Thalia", "Hung", "Tony", "Ayla", "Jimmy"),
+   salary = c(623.3, 515.2, 611.0, 729.0, 843.25), 
+   start_date = as.Date(c("2012-01-01", "2013-09-23", "2014-11-15", "2014-05-11",
+      "2015-03-27")),
+   stringsAsFactors = FALSE
+)
+# Print the data frame.			
+print(employee_df) 
+```
+**Rename the columns in dataframe**
+```{r}
+colnames(employee_df) <- c('ID', 'NAME', 'PAY', 'DATE')
+print(employee_df)
+
+```
+
+| Expression     | Result     |
+|:-----------------|:-------------| 
+|  class(list(1,2,3,4,'hello'))      |   `r class(list(1,2,3,4,'hello'))`     |
+|  typeof(list(1,2,3,4,'hello'))     |   `r typeof(list(1,2,3,4,'hello'))`    |
+|  length(list(1,2,3,4))      |   `r length(list(1,2,3,4))`     |
+|  typeof(list(1,2,3,4)     |   `r typeof(list(1,2,3,4))`    |
+|  class(c(1,2,3,4))    |   `r class(c(1,2,3,4))`   |
+|  typeof(c(1,2,3,4))   |   `r typeof(c(1,2,3,4))` |
+|  class(c('a', 'b', 'c', 'd')) |   `r class(c('a', 'b', 'c', 'd'))`|
+|  typeof(c('a', 'b', 'c', 'd')) |   `r typeof(c('a', 'b', 'c', 'd'))`|
+|  class(factor(c(1,2,2,3)))  |   `r class(factor(c(1,2,2,3)))` |
+|  typeof(factor(c(1,2,2,3)))  |   `r typeof(factor(c(1,2,2,3)))` |
+|  class(factor(c("Female","Male")))  |   `r class(factor(c("Female","Male")))` |
+|  typeof(factor(c("Female","Male")))  |   `r typeof(factor(c("Female","Male")))` |
+
+- Note how class() gives you high-level data type while typeof() gives you low-level data type.
+- Note factor is stored as integer at the lower level no matter whether it is defined using the vecotors of integer.
+
+$ \text{This is the END}$ 
+$ \text{This is the END}$ 
