@@ -36,7 +36,7 @@ output:
 
     clusterrolebinding.rbac.authorization.k8s.io/cluster-admin-binding created
 
-Now that you have your Kubernetes cluster running, it’s time to begin **Setup JupyterHub**.
+Now that you have your Kubernetes cluster running, the next step is **Setting up Helm**.
 
 ### II. Setup Helm
 
