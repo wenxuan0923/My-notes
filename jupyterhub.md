@@ -149,14 +149,14 @@ GCP Reference: https://cloud.google.com/container-registry/docs/pushing-and-pull
 From: https://docs.docker.com/toolbox/toolbox_install_windows/ </br>
 
 After finish the installation, click the Docker QuickStart icon to launch a pre-configured Docker Toolbox terminal. If you run the command: `docker run hello-world` can see the output `Hello from Docker` meaning Docker is successfully installed.
-<center><img src='pics/docker_install.jpg' width='600px'></img></center>
+<center><img src='pics/docker_install.JPG' width='600px'></img></center>
 
 **2. Install repo2docker**
 
     pip install jupyter-repo2docker
 
 repo2docker will convert a github repo into a docker image. The github repo should at least has a `requirements.txt` file like this:
-<center><img src='pics/github.jpg' width='300px'></img></center>
+<center><img src='pics/github.JPG' width='300px'></img></center>
 
 **3. Create a docker image from a github repository**
 
