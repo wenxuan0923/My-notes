@@ -203,7 +203,6 @@ Edit the JupyterHub configuration to build from this image. Edit config.yaml fil
 
  If you are already logged in. If you already have a running JupyterHub session, you’ll need to restart it (by stopping and starting your session from the control panel in the top right). New users won’t have to do this.
 
-        kubectl create configmap jupyterhub-config --from-file=./jupyterhub_config.py
 
 ### VI. Embed your jupyterhub into website
 
