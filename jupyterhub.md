@@ -205,7 +205,7 @@ Edit the JupyterHub configuration to build from this image. Edit config.yaml fil
 
         kubectl create configmap jupyterhub-config --from-file=./jupyterhub_config.py
 
-### VII. Embed your jupyterhub into website
+### VI. Embed your jupyterhub into website
 
 To embed your jupyterhub into website you can use iframe:
 ```
